@@ -116,6 +116,10 @@ if (NOT (ARCHITECTURE_arm64 OR ARCHITECTURE_arm64ec OR ARCHITECTURE_x86_64))
     " If you believe this is in error, file an issue.")
 endif()
 
+if (FEX_IOS_HOST_BUILD)
+  add_compile_definitions(FEX_IOS_HOST=1)
+endif()
+
 # Madeira iOS host: 32-bit guest window (the Guest32Base option). A WoW64 process on the iOS host
 # cannot own the low 4 GiB, so its guest lives in a 4 GiB window elsewhere. Only the aarch64 WOW64
 # module needs this. It is never compiled into the ARM64EC module: there the generated IR and
