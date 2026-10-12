@@ -67,6 +67,8 @@ $end_info$
 /* iOS-Madeira ml622: mirror of rpmalloc's POD snapshot (rpmalloc.c). Declared here
  * rather than in a shared header because rpmalloc is C and vendored; keep the two
  * definitions in sync — the drain below is the only consumer. */
+/* Apple builds disable rpmalloc in CMake, so there is no snapshot producer. */
+#ifndef __APPLE__
 extern "C" {
 struct rpm_cas_snapshot {
   unsigned long long page_addr, block_addr, heap_addr, owner_teb;
@@ -77,6 +79,7 @@ struct rpm_cas_snapshot {
 };
 int rpm_cas_snapshot_take(struct rpm_cas_snapshot* out);
 }
+#endif
 #include <condition_variable>
 #include <fcntl.h>
 #include <functional>
@@ -1968,6 +1971,7 @@ uintptr_t ContextImpl::CompileBlock(FEXCore::Core::CpuStateFrame* Frame, uint64_
        * automatically healthy contention — it can equally be page reuse or a
        * foreign writer, so check block_index/list_size against block_count before
        * concluding anything. */
+#ifndef __APPLE__
       {
         rpm_cas_snapshot Snap;
         if (rpm_cas_snapshot_take(&Snap)) {
@@ -1981,6 +1985,7 @@ uintptr_t ContextImpl::CompileBlock(FEXCore::Core::CpuStateFrame* Frame, uint64_
                             Snap.fail_changed, Snap.fail_unchanged, Snap.fail_invalid);
         }
       }
+#endif
     }
   }
 
